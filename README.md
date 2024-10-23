@@ -1,1 +1,1 @@
-I will updat as i proceed
+I will update as i proceed
