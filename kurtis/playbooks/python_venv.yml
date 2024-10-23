@@ -1,0 +1,45 @@
+# Every playbook must start with these 3 lines
+---
+# This playbook is to create the python virtual environment
+- name: Create a python virtual environment
+  hosts: localhost  ### The "{{ target }}" means, the host will be specified on the command line
+  gather_facts: true
+  # become: true
+  # become_method: sudo
+  # become_user: root
+######The above is the header for every plabybook
+  tasks:
+    # - name: Update All
+    #   ansible.builtin.command: yum -y update
+    - name: Update all packages
+      yum:
+        name: '*'
+        state: latest
+      become: true
+      become_method: sudo
+      become_user: root
+    - name: Instally python39
+      ansible.builtin.yum:
+        name: python39
+        state: present
+      become: true
+      become_method: sudo
+      become_user: root
+    - name: Create the python virtual environment with python39
+      command: "python3 -mvenv /home/ansible/py_venv"
+    - name: Ensure ansilbe owns the python virtual environment
+      file:
+        path: /home/ansible/py_venv
+        owner: ansible
+        group: ansible
+        state: directory
+        mode: "ug=rwX,o=rX"
+    - name: Upgrade pip
+      pip:
+        name: pip
+        extra_args: --upgrade
+        virtualenv: /home/ansible/py_venv
+    - name: Install ansible
+      pip:
+        name: ansible
+        virtualenv: /home/ansible/py_venv
