@@ -1,1 +1,12 @@
-#Place holder
+client.1 ansible_host=10.1.14.62
+
+
+
+
+
+####Groups 
+[Dev]
+client.1
+
+
+

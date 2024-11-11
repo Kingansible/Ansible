@@ -1,0 +1,28 @@
+# User creation playbook
+---
+- name: Create user
+  hosts: "{{ target }}"
+  gather_facts: yes
+  become: yes
+  become_method: sudo
+  become_user: root
+
+  tasks:
+
+    - name: Create user
+      user:
+        name: ansible
+        createhome: yes
+        state: present
+        # password: "{{ mts1234 | password_hash('sha512') }}"
+        password: 1a15c846871678efd243f9c188f2ad1ecb965be01ec43b713cd85b59d9f0af86af32cad66f85b10b97f6c42061a380b347aed7cb63f48cad2e81bd07fc42bdb0
+        update_password: on_create
+    
+    - name: Add user to sudoers
+      copy:
+        src: ../files/ansible.sudo
+        dest: "/etc/sudoers.d/ansible"
+        owner: root
+        group: root
+        mode: 0440
+        validate: "visudo -csf %s"
