@@ -18,11 +18,11 @@
         password: $6$mysecretsalt$zd6jwPHMHoV9UiAFTzd.G8Hms3YlCNB9YBHtCWhRD2LRsIg5E5PGos8YOMnFHLdxYa/CcjeTmwB5qfnvVAvnG/
         update_password: on_create
     
-    #- name: Add user to sudoers
-    #  copy:
-    #    src: ../files/ansible.sudo
-    #    dest: "/etc/sudoers.d/ansible"
-    #    owner: root
-    #    group: root
-    #    mode: 0440
-    #    validate: "visudo -csf %s"
+    - name: Add user to sudoers
+      copy:
+        src: ../files/ansible.sudo
+        dest: "/etc/sudoers.d/ansible"
+        owner: root
+        group: root
+        mode: 0440
+        validate: "visudo -csf %s"
