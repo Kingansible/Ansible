@@ -1,0 +1,24 @@
+---
+- name: Remove packages
+  hosts: "{{ target }}"
+  gather_facts: true
+  become: true
+  become_method: sudo
+  become_user: root
+
+  tasks:
+
+    - name: remove selected packages
+      yum:
+        name: ['httpd',
+               'php*']
+        state: absent
+
+    - name: Close the listed ports
+      firewalld:
+        port: "{{ item }}"
+        permanent: true
+        state: disabled
+      with_items:
+        - 80/tcp
+        - 443/tcp
