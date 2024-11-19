@@ -1,0 +1,38 @@
+---
+- name: Update dnf & Install apche server on centos8
+  hosts: "{{ target }}"
+  gather_facts: true
+  become: true
+  become_method: sudo
+  become_user: root
+
+  tasks:
+
+    - name: Ensure DNF cache is up to date
+      dnf:
+        update_cache: yes
+    
+    - name: Install Apache (httpd) on CentOS 8
+      dnf:
+        name: httpd
+        state: present
+    
+    - name: Start Apache service
+      service:
+        name: httpd
+        state: started
+        enabled: yes
+    
+    - name: Allow HTTP traffic through the firewall
+      firewalld:
+        service: http
+        permanent: yes
+        state: enabled
+    
+    - name: Reload firewall to apply changes
+      command: firewall-cmd --reload
+    
+    - name: Ensure Apache is running
+      service:
+        name: httpd
+        state: started
