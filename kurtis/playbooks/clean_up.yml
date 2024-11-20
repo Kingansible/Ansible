@@ -16,7 +16,7 @@
 
     - name: remove apadche directory
       file:
-        src: "{{ item }}"
+        path: "{{ item }}"
         state: absent 
       with_items: 
         - /etc/httpd/
