@@ -14,6 +14,14 @@
                'php*']
         state: absent
 
+    - name: remove apadche directory
+      file:
+        src: "{{ item }}"
+        state: absent 
+      with_items: 
+        - /etc/httpd/
+        - /var/www/html/       
+
     - name: Close the listed ports
       firewalld:
         port: "{{ item }}"
