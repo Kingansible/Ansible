@@ -36,3 +36,32 @@
       service:
         name: httpd
         state: started
+        
+    - name: Install PHP 7.4
+      package:
+        name: php
+        state: present
+    
+    - name: Install MySQL server
+      package:
+        name: mysql-server
+        state: present
+    
+    - name: Ensure MySQL service is running and enabled
+      service:
+        name: mysqld
+        state: started
+        enabled: yes  
+        
+    - name: Synchronize website template from Ansible controller to client server
+      synchronize:
+        src: ../files/lawfirm/
+        dest: /var/www/html/
+        recursive: yes
+        mode: push
+    
+    - name: Create info.php page for the website
+      copy: 
+        content: "<?php phpinfo(); ?>"
+        dest: /var/www/html/info.php
+        mode: '0644'  
