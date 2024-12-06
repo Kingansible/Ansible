@@ -1,0 +1,85 @@
+---
+- name: Install and configure Apache Tomcat on CentOS 8
+  hosts: "{{ target }}"
+  gather_facts: true
+  become: true
+  become_method: sudo
+  become_user: root
+
+  tasks:
+    - name: Ensure DNF cache is up to date
+      dnf:
+        update_cache: yes
+        
+    - name: Install required packages
+      dnf:
+        name:
+          - java-11-openjdk
+          - wget
+        state: present
+
+    - name: Create Tomcat group and user
+      user:
+        name: tomcat
+        group: tomcat
+        shell: /bin/bash
+        create_home: yes
+
+    - name: Download Apache Tomcat
+      get_url:
+        url: https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.79/bin/apache-tomcat-9.0.79.tar.gz
+        dest: /tmp/apache-tomcat-9.0.79.tar.gz
+        mode: '0644'
+
+    - name: Extract Apache Tomcat tarball
+      unarchive:
+        src: /tmp/apache-tomcat-9.0.79.tar.gz
+        dest: /opt/
+        remote_src: yes
+        creates: /opt/apache-tomcat-9.0.79
+
+    - name: Set correct ownership for Tomcat directory
+      file:
+        path: /opt/apache-tomcat-9.0.79
+        owner: tomcat
+        group: tomcat
+        mode: '0755'
+        recurse: yes
+
+    - name: Create Tomcat systemd service file
+      copy:
+        dest: /etc/systemd/system/tomcat.service
+        content: |
+          [Unit]
+          Description=Apache Tomcat Web Application Container
+          After=network.target
+
+          [Service]
+          Type=forking
+          User=tomcat
+          Group=tomcat
+          Environment="JAVA_HOME=/usr/lib/jvm/java-11-openjdk"
+          Environment="CATALINA_PID=/opt/apache-tomcat-9.0.79/temp/tomcat.pid"
+          Environment="CATALINA_HOME=/opt/apache-tomcat-9.0.79"
+          Environment="CATALINA_BASE=/opt/apache-tomcat-9.0.79"
+          ExecStart=/opt/apache-tomcat-9.0.79/bin/startup.sh
+          ExecStop=/opt/apache-tomcat-9.0.79/bin/shutdown.sh
+          TimeoutSec=300
+
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Reload systemd to pick up the Tomcat service
+      systemd:
+        daemon_reload: yes
+
+    - name: Enable Tomcat service to start on boot
+      systemd:
+        name: tomcat
+        enabled: yes
+        state: started
+
+    - name: Start Tomcat service
+      systemd:
+        name: tomcat
+        state: started
