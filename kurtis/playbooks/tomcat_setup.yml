@@ -64,12 +64,15 @@
           User=tomcat
           Group=tomcat
           Environment="JAVA_HOME=/usr/lib/jvm/java-11-openjdk"
-          Environment="CATALINA_PID=/opt/apache-tomcat-10.1.33/temp/tomcat.pid"
           Environment="CATALINA_HOME=/opt/apache-tomcat-10.1.33"
           Environment="CATALINA_BASE=/opt/apache-tomcat-10.1.33"
+          Environment="CATALINA_PID=/opt/apache-tomcat-10.1.33/temp/tomcat.pid"
           ExecStart=/opt/apache-tomcat-10.1.33/bin/startup.sh
           ExecStop=/opt/apache-tomcat-10.1.33/bin/shutdown.sh
+          ExecReload=/opt/apache-tomcat-10.1.33/bin/shutdown.sh && /opt/apache-tomcat-10.1.33/bin/startup.sh
           TimeoutSec=300
+          StandardOutput=syslog
+          StandardError=syslog
 
           [Install]
           WantedBy=multi-user.target
